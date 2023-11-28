@@ -1,169 +1,190 @@
 
-//Importieren der relevanten Dart-Files
+//Hier können Zutaten zur Datenbank hinzugefügt oder entfernt werden
+
+//zutatDatabaseEditHive.dart
 import 'package:flutter/material.dart';
 import 'package:myfutterapp/constant.dart';
-import 'package:myfutterapp/Detailansicht.dart';
-import 'package:myfutterapp/filter.dart';
-import 'package:myfutterapp/Übersichtseite.dart';
+import 'package:myfutterapp/zutat.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:myfutterapp/boxes.dart';
+import 'package:myfutterapp/databaseBoxFilter.dart';
+import 'package:myfutterapp/databaseBoxRezepte.dart';
+import 'package:myfutterapp/databaseBoxMapping.dart';
+import 'package:myfutterapp/databaseBoxRezepteGefiltert.dart';
+import 'package:myfutterapp/footer.dart';
+import 'package:myfutterapp/detailview.dart';
+import 'package:myfutterapp/Uebersichtsseite.dart';
+import 'package:myfutterapp/zutatDatabaseEditHive.dart';
+import 'package:myfutterapp/databaseBoxAehnlich.dart';
+import 'package:myfutterapp/header.dart';
+
 
 class aenlicheRezepte extends StatefulWidget {
   aenlicheRezepte();
   @override
-  _aenlicheRezepte createState() => _aenlicheRezepte();
-}
-
+  _aenlicheRezepte createState() => _aenlicheRezepte ();}
 
 class _aenlicheRezepte extends State<aenlicheRezepte>{
 
-  //Später dynamisch machen mit echter Anzahl
-  int ergebnisAnzahlaenlich = 10;
+  //Der Wert aus dem Textfeld wird später die Zutat
+  TextEditingController zutatController = TextEditingController();
 
   @override
   Widget build(BuildContext context){
 
-    // Scaffold Widget zur Unterteilung
     return Scaffold(
 
-      //Hintergrund heller
       backgroundColor: yellowToneLight,
 
-      //Body = Gesamte Seite zum Scrollen
+      appBar:  AppBar(
+
+        //Automatischen Pfeil entfernen
+        automaticallyImplyLeading: false,
+        toolbarHeight: 100,
+        elevation: 0.0,
+        backgroundColor: yellowText,
+
+        title: header(title: ' MyFutterApp '),
+      ),
+
       body: SingleChildScrollView(
-        child: Container(
-
-          /* Folgende drei Abschnitte werden untereinander angeordnete mit Column:
-         Zurück-Knopf, gefilterte Rezepte, neu Filtern*/
-
-          child: Column (
-
-            //Unterteilung in die 3 oben genannten Abschnitte
+        child: Center(
+          child: Column(
             children: [
-
-              // 1. Zurück-Knopf
-
-              Container(
-
-                //Design
-                color: yellowToneDark,
-                height: 100.00,
-
-                child:
-
-                // Verweis zurück zur Übersicht
-                GestureDetector (
-                  onTap: () { Navigator.of(context).push (MaterialPageRoute(builder: (context) => OverviewPage()),);},
-
-                  child: Align(
-                    alignment: Alignment.bottomCenter,
-
-                    child:
-                    Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Text("ZURÜCK ZUR ÜBERSICHT",
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20.0, fontFamily: 'Rooney',),),
-                        ]
-                    ),
-                  ),
-                ),
-              ),
-
-
-              Container (height: 20.00, color: yellowToneDark,),
 
               SizedBox(height: 20.00,),
 
-              // Ergebnisboxen, abhängig von Anzahl
-              Column (children: List.generate (ergebnisAnzahlaenlich, (index) =>
+              Text('Ähnliche Rezepte:',style: TextStyle(color: darkGrey, fontWeight: FontWeight.bold, fontSize: 20.0, fontFamily: 'Rooney',),),
 
-                //Bei Anklicken: Weiterleiten auf die Detailansicht
-                GestureDetector (
-                    onTap: () { Navigator.of(context).push (MaterialPageRoute(builder: (context) => detailAnsicht()),);},
+              SizedBox(height: 10.00,),
 
-                    // Übersichtsbox erstellen
-                    child: Container (
-                      height: 70.00,
-                      width: 370.00,
+              Container(
 
-                      decoration: BoxDecoration (color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                //Stylen
+                height: 500.00,
+                width: 370.00,
+                decoration: BoxDecoration (color: yellowToneDark, borderRadius: BorderRadius.circular(20)),
 
-                      //Inhalt pro Rezeptübersicht (Bild, Titel, Kurzbeschriebung)
-                          child: Row(
 
-                            //Elemente der Reihe gleichmäßig nebeneinander spacen
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                child: boxAehnlich.length != 0?
+                ListView.builder (itemCount: boxAehnlich.length, itemBuilder: (context, index) {
+                  databaseBoxAehnlich aehnlRezept = boxAehnlich.getAt(index);
+                  int ID = aehnlRezept.aehnlich_id;
+                  databaseBoxRezepte rezepte = boxRezepte.getAt(ID);
+                  String zeit = rezepte.rezepte_zeit;
+                  String titel = rezepte.rezepte_titel;
 
-                            children: [
+                  if (boxAehnlich.length != 0) {
+                    return ListTile(
 
-                              SizedBox (width: 10.00,),
+                      title: GestureDetector(onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => Detailview(index: index),),);
+                      },
 
-                              //Essensbild
-                              //Platzhalter -> später echtes Bild
-                              Text("BILD"),
-                              SizedBox (width: 10.00,),
+                        child: Align(
+                          alignment: Alignment.bottomCenter,
+                          // Übersichtsbox erstellen
+                          child: Container(
+                            height: 70.00,
+                            width: 370.00,
 
-                              // Rezeptübersicht Inhalt
-                              Column (
+                            decoration: BoxDecoration(color: Colors.white,
+                                borderRadius: BorderRadius.circular(20)),
 
-                                //Elemente linksbündig anordnen
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                            //Inhalt pro Rezeptübersicht (Bild, Titel, Kurzbeschreibung)
+                            child: Row(
 
-                                children:[
+                              children: [
 
-                                  SizedBox(height: 5.00,),
+                                SizedBox(width: 40.00,),
+                                //Platzhalter
+                                Text((index+1).toString(), style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold, fontSize: 30.0, fontFamily: 'CooperBlack',),),
 
-                                  // Inhalt einer jeweiligen Rezeptübersicht
-                                  Text("Titel", style: TextStyle (color: darkGrey, fontSize: 20.0, fontWeight: FontWeight.bold, fontFamily: 'Rooney',),),
-                                  Row(
-                                    children: [
-                                    Text ("Zubereitungszeit: X Minuten", style: TextStyle (color: lightGrey, fontSize: 10.0, fontFamily: 'Rooney',),),
-                                    SizedBox (height: 5.00,),
-                                    Text ("  |  ", style: TextStyle (color: lightGrey, fontSize: 10.0, fontFamily: 'Rooney',),),
-                                    SizedBox (height: 5.00,),
-                                    Text ("Rezeptart", style: TextStyle (color: lightGrey, fontSize: 10.0, fontFamily: 'Rooney',),),
+                                SizedBox(width: 40.00,),
+                                // Rezeptübersicht Inhalt
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    SizedBox(height: 10.00,),
+                                    // Inhalt einer jeweiligen Rezeptübersicht
+                                    Text("$titel", style: TextStyle(color: darkGrey, fontSize: 20.0, fontWeight: FontWeight.bold, fontFamily: 'Rooney',),),
+
+                                    Text("Zubereitungszeit: $zeit", style: TextStyle(color: yellowText, fontSize: 10.0, fontFamily: 'Rooney',),),
                                     ],
                                   ),
-                                  Text ("Ich bin ein Satz Kurzbeschreibung.", style: TextStyle (color: yellowText, fontSize: 10.0, fontFamily: 'Rooney',),),
-                                ],
-                              ),
-
-                              SizedBox (width: 5.00,),],
-
-                            // Schließen einer Rezeptübersicht
+                              ],
+                              // Schließen einer Rezeptübersicht
+                            ),
                           ),
+                        ),
+                      ),
+                    );
+                  }
+                },
+                )
 
-                      //Abstand zwischen den einzelnen Boxen herstellen
-                      margin: EdgeInsets.only(bottom: 12.00),
+                : Column(
+
+                  children: [
+
+                    SizedBox(height: 170.00,),
+
+                    Container (
+                      height: 50.00,
+                      width: 350.00,
+
+                      child: Align (
+                        alignment: Alignment.center,
+                        child: Text("Leider keine passenden", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25.0, fontFamily: 'CooperBlack',),),
+                      ),
                     ),
+
+                    Container (
+                      height: 50.00,
+                      width: 350.00,
+
+                      child: Align (
+                        alignment: Alignment.center,
+                        child: Text("Rezepte!", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 25.0, fontFamily: 'CooperBlack',),),
+                      ),
+                    ),
+
+
+                    Container (
+                      height: 50.00,
+                      width: 350.00,
+
+                      child: Align (
+                        alignment: Alignment.center,
+                        child: Text("Bitte versuche es mit anderen Zutaten!", style: TextStyle(color: yellowText, fontWeight: FontWeight.bold, fontSize: 15.0, fontFamily: 'Rooney',),),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
               ),
 
               SizedBox(height: 5.00,),
 
-              // Neu-Filtern-Knopf
-              GestureDetector (onTap: () { Navigator.of(context).push (MaterialPageRoute(builder: (context) => filter()),);},
+              // Ähnliche-Ergebnisse-Knopf
+              GestureDetector (onTap: () { Navigator.of(context).push (MaterialPageRoute(builder: (context) => ausgabe()),);},
                 child: Container(
 
                   //Gestaltung
                   height: 40.00, width: 350.00,
-                  decoration: BoxDecoration (color: yellowToneDark, borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration (color: yellowText, borderRadius: BorderRadius.circular(20)),
 
-                  //Anklick Option
                   child:
-                  //Zentrieren
                   Center(
                     child:
-                    //Text
-                    Text ("Neu Filtern", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.00, fontFamily: 'Rooney',),),),
+                    Text ("Zurück zu den ursprünglichen Ergebnisse", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.00, fontFamily: 'Rooney',),),),
                 ),),
-
-              SizedBox(height: 30.00,),
 
             ],
           ),
         ),
       ),
+      bottomNavigationBar: Footer(),
     );
   }
 }

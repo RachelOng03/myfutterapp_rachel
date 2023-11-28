@@ -1,94 +1,101 @@
-
-//Dieses File beinhaltet die Filterseite unserer MyFutterApp
-
-//Importieren der relevanten Dart-Files
 import 'package:flutter/material.dart';
-import 'package:myfutterapp/constant.dart';
-import 'package:myfutterapp/Übersichtseite.dart';
-import 'package:myfutterapp/Detailansicht.dart';
 import 'package:myfutterapp/filterWidget.dart';
-import 'package:myfutterapp/zutatDatabaseEditHive.dart';
-import 'package:myfutterapp/boxes.dart';
-import 'package:myfutterapp/zutat.dart';
+import 'package:myfutterapp/filterErgebnisse.dart';
+import 'package:myfutterapp/constant.dart';
+import 'package:myfutterapp/header.dart';
 
+//Hier benötigt wegen anderem Footer
+import 'package:myfutterapp/rezeptcreate.dart';
+
+// Grundgerüst für gewisse Eigenschaften der App (wie Farbschema und Titel)
 class filter extends StatefulWidget {
+  final String title = 'MyFutterApp';
   filter();
+  @override
+  State<filter> createState() => _filter();
+}
+// Klasse = die Startseite der App
+
+class _filter extends State<filter> {
 
   @override
-  _filter createState() => _filter();}
-
-
-class _filter extends State<filter>{
-
-  @override
-  Widget build(BuildContext context){
-
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: yellowToneLight,
+      appBar: AppBar(
 
-      //Oberfläche zum Scrollen
-      body: SingleChildScrollView(
-        child: Container(
+        //Automatischen Pfeil entfernen
+        automaticallyImplyLeading: false,
+        toolbarHeight: 100,
+        elevation: 0.0,
+        backgroundColor: yellowText,
+
+        title: header(title: widget.title,),
+      ),
+      // Ausschmücken der Appbar mit Schriftart und Bildern (+jeweilige Eigenschaften)
+      body:
+        SingleChildScrollView(
           child: Center(
-            child: Column (
-
-              //Gestaltung der Seite
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-
-                SizedBox(height: 80.00,),
-                Text("Wähle mindestens fünf Zutaten:",style: TextStyle(color: darkGrey, fontWeight: FontWeight.bold, fontSize: 20.0, fontFamily: 'Rooney',),),
-                SizedBox(height: 40.00,),
-
-                //Hier werden die einzelnen Zutatenboxen zum Anklicken erstellt
-                //Soviele Zutatenboxen wie passen werden in eine Zeile gepackt
-
-                Wrap(
-
-                  //Boxen mit Abstand anordnen
-                  spacing: 5.00,
-                  runSpacing: 5.00,
-                  //Zentrieren
-                  alignment: WrapAlignment.center,
-
-                  //Anzahl der Boxen von Zutatenmenge abhängig
-                  children: List.generate (boxZutat.length, (index) =>
-                      Container(
-                          padding: EdgeInsets.all(10.00),
-                          //Da die Boxen responsive sein müssen, gibt es für das Speichern der Zutaten und das Erstellen eine eigene Dart Datei
-                          //Siehe: "filterWidget.dart"
-                          child: filterWidget(index: index),
-                      ),
-                  ),
+                SizedBox(height: 20),
+                Text(
+                  'Womit kochen wir heute?',
+                  style: TextStyle(fontSize: 23, fontWeight: FontWeight.bold),
                 ),
-
-                //Platzhalter zwischen den Containern
-                SizedBox(height: 40.00,),
-
-                // Rezeptsuche-Starten-Knopf
-                //Leitet weiter auf die Overview-Seite
-                GestureDetector (onTap: () { Navigator.of(context).push (MaterialPageRoute(builder: (context) => OverviewPage()),);},
-                  child: Container(
-
-                    //Gestaltung
-                    height: 40.00, width: 350.00,
-                    decoration: BoxDecoration (color: yellowText, borderRadius: BorderRadius.circular(20)),
-
-                    child:
-                      //Zentrieren
-                      Center(
-                        child:
-                        //Text
-                          Text ("Rezeptsuche starten", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.00, fontFamily: 'Rooney',),),
-                      ),
-                    ),
-                ),
-
-                // Platzhalter zwischen den Containern
-                SizedBox(height: 30.00,),
-
+                // Definiert Inhalt und den Bereich zwischen Textfeldern und Appbar
+                filterErgebnisse(),
+                // Definiert Eigenschaften von zusätzlich hinzugefügten Texteingabefeldern
               ],
             ),
           ),
+        ),
+      bottomNavigationBar:
+      Container(
+        color: Colors.white,
+        height: 51.00,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  fixedSize: Size.fromHeight(50.00),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(0.0),
+                  ),
+                  primary: darkGrey,),
+                onPressed: () {
+                  // Nichts, da schon auf der Seite!
+                },
+                label: Text('Filter',style: TextStyle (color: lightGrey, fontWeight: FontWeight.bold, fontSize: 17.00, fontFamily: 'Rooney',),),
+                icon: Icon(Icons.home, color: lightGrey,),
+
+              ),
+            ),
+
+            SizedBox(width: 2.00,),
+
+            //Button zur Startseite hin
+            Expanded(
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  fixedSize: Size.fromHeight(50.00),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(0.0),
+                  ),
+                  primary: yellowText,),
+
+                onPressed: () {
+                  Navigator.of(context).push (MaterialPageRoute(builder: (context) => Rezeptcreate()),);
+                },
+                label: Text('Rezepte teilen',style: TextStyle (color: Colors.white, fontWeight: FontWeight.bold, fontSize: 17.00, fontFamily: 'Rooney',),),
+                icon: Icon(Icons.add, color: Colors.white,),
+              ),
+            ),
+          ],
+          //Button zum Erstellen eigener Rezepte hin (ausgegraut hier weil wir auf der Seite sind)
         ),
       ),
     );

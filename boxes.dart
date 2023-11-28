@@ -9,3 +9,4 @@ late Box boxFilter;
 late Box boxMapping;
 late Box boxGefilterteRezepte;
 late Box boxRezepte;
+late Box boxAehnlich;

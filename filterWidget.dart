@@ -7,7 +7,6 @@ import 'package:myfutterapp/constant.dart';
 import 'package:myfutterapp/zutat.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:myfutterapp/boxes.dart';
-import 'package:myfutterapp/filter.dart';
 import 'package:myfutterapp/databaseBoxFilter.dart';
 
 
@@ -118,57 +117,55 @@ class filterWidget extends StatefulWidget {
             break;
           }
         }
-      }
+      } else {//nichts
+        }
     }
 
 
     @override
     Widget build(BuildContext context) {
       //Flipschalter bauen
-      return Container(
-        child: FilterChip(
+      return FilterChip(
 
-          //Label des Buttons ist die aktuelle Zutat
-          label: Text(aktuelleZutat.zutat),
-          selected: gefiltert,
+        //Label des Buttons ist die aktuelle Zutat
+        label: Text(aktuelleZutat.zutat),
+        selected: gefiltert,
 
-          //Wenn der Button ausgewählt wird:
-          onSelected: (bool value) {
+        //Wenn der Button ausgewählt wird:
+        onSelected: (bool value) {
 
-            //Der Filter muss aktualisiert werden
-            _filterAktualisieren();
+          //Der Filter muss aktualisiert werden
+          _filterAktualisieren();
 
-            //Ist das Item schon im Filter gewesen, wird es nun beim abwaehlen daraus gelöscht
-            if (gefiltert == true) {
-              boxFilter.deleteAt(zutatidFilter);
+          //Ist das Item schon im Filter gewesen, wird es nun beim abwaehlen daraus gelöscht
+          if (gefiltert == true) {
+            boxFilter.deleteAt(zutatidFilter);
 
-            } else {
-              //Ist das Item nicht gewählt gewesen, wird es in die Filter-Box gespeichert
-              boxFilter.put(aktuelleZutat.zutat, databaseBoxFilter(
-                  boxFilter_id: aktuelleZutat.zutat_id,
-                  boxFilterZutat: aktuelleZutat.zutat),
-              );
-            };
+          } else {
+            //Ist das Item nicht gewählt gewesen, wird es in die Filter-Box gespeichert
+            boxFilter.put(aktuelleZutat.zutat, databaseBoxFilter(
+                boxFilter_id: aktuelleZutat.zutat_id,
+                boxFilterZutat: aktuelleZutat.zutat),
+            );
+          };
 
-            //Invertieren des aktuellen Zustands beim Anklicken des Buttons
-              setState(() {
-                gefiltert = !gefiltert;
-                }
-              );
-            },
+          //Invertieren des aktuellen Zustands beim Anklicken des Buttons
+          setState(() {
+            gefiltert = !gefiltert;
+          }
+          );
+          },
 
-          //Der Button soll nach dem Auswählen soll wie folgt aussehen:
-          selectedColor: yellowToneDark,
-          //Der Button der nicht Ausgewählt ist, soll wie folgt aussehen:
-          backgroundColor: yellowToneLight,
+        //Der Button soll nach dem Auswählen soll wie folgt aussehen:
+        selectedColor: yellowToneDark,
+        //Der Button der nicht Ausgewählt ist, soll wie folgt aussehen:
+        backgroundColor: yellowToneLight,
 
-          //Text Styling
-          labelStyle: TextStyle(color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 15.00,
-            fontFamily: 'Rooney',),
-
-        ),
+        //Text Styling
+        labelStyle: TextStyle(color: Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 15.00,
+          fontFamily: 'Rooney',),
       );
     }
   }

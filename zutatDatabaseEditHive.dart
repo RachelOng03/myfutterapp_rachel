@@ -5,10 +5,14 @@
 import 'package:flutter/material.dart';
 import 'package:myfutterapp/constant.dart';
 import 'package:myfutterapp/zutat.dart';
-import 'package:myfutterapp/Übersichtseite.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:myfutterapp/boxes.dart';
 import 'package:myfutterapp/databaseBoxFilter.dart';
+import 'package:myfutterapp/databaseBoxRezepte.dart';
+import 'package:myfutterapp/databaseBoxMapping.dart';
+import 'package:myfutterapp/databaseBoxRezepteGefiltert.dart';
+import 'package:myfutterapp/footer.dart';
+import 'package:myfutterapp/Uebersichtsseite.dart';
 
 class zutatDatabaseEditHive extends StatefulWidget {
   zutatDatabaseEditHive();
@@ -33,7 +37,7 @@ class _zutatEditDatabase extends State<zutatDatabaseEditHive>{
                 SizedBox(height: 70.00,),
 
                 // Zurück zur Overview-Seite führen
-                GestureDetector (onTap: () { Navigator.of(context).push (MaterialPageRoute(builder: (context) => OverviewPage()),);},
+                GestureDetector (onTap: () { Navigator.of(context).push (MaterialPageRoute(builder: (context) => ausgabe()),);},
                   child: Row(
                     children: [
 
@@ -44,7 +48,7 @@ class _zutatEditDatabase extends State<zutatDatabaseEditHive>{
                         height: 25.00, width: 220.00,
                         decoration: BoxDecoration (color: yellowToneDark, borderRadius: BorderRadius.circular(20)),
                         child: Center (
-                          child: Text ("<< Zurück zur Rezept-Eingabe", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.00, fontFamily: 'Rooney',),
+                          child: Text ("<< Zurück zur Übersicht", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.00, fontFamily: 'Rooney',),
                           ),
                         ),
                       ),
@@ -83,15 +87,39 @@ class _zutatEditDatabase extends State<zutatDatabaseEditHive>{
                   ),
                   //Wenn gedrückt:
                   onPressed: () {
-                    //Bedingung: Eingabe darf nicht leer sein
-                      if (zutatController.text.isNotEmpty) {
-                          setState(() {
-                          boxZutat.put ('key_${zutatController.text}', Zutat (zutat_id: boxZutat.length + 1, zutat: zutatController.text),);}
-                          );
-                  }
-                  },
 
-                  child: Text('Zutat eingeben', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.00, fontFamily: 'Rooney',),),),
+                    //Löschen bestimmter Zutaten falls notwendig (zB Falsche Rechtschreibung, etc):
+
+                    /* late int zutatidFilter;
+
+                        for (var i = 0; i < boxZutat.length; i++) {
+                          //Aktuelle Zutat zuweisen
+                          var Loeschen = boxZutat.getAt(i);
+                          // Abspeichern, falls die zutat_id passt
+                          if (27 == Loeschen.zutat_id) {
+                            //Platz in FilterBox speichern
+                            zutatidFilter = i;
+                            //Abbrechen der Schleife falls wahr
+                            break;
+                          }
+                        }
+
+                    setState(() {
+                        boxZutat.deleteAt(zutatidFilter);
+                    });
+
+                    */
+
+                    setState(() {
+                      boxZutat.put ('key_${zutatController.text}', Zutat (zutat_id: boxZutat.length +1, zutat: zutatController.text),);
+                    });
+
+
+                    },
+
+
+                  child: Text('Zutat eingeben', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15.00, fontFamily: 'Rooney',),),
+                   ),
 
 
                 SizedBox(height: 20.00,),
@@ -130,6 +158,10 @@ class _zutatEditDatabase extends State<zutatDatabaseEditHive>{
 
                 SizedBox(height: 30.00,),
 
+                Text('Filter:',style: TextStyle(color: darkGrey, fontWeight: FontWeight.bold, fontSize: 20.0, fontFamily: 'Rooney',),),
+
+                SizedBox(height: 10.00,),
+
                 Container(
 
                   //Stylen
@@ -147,10 +179,99 @@ class _zutatEditDatabase extends State<zutatDatabaseEditHive>{
                   }
                   ),
                 ),
+
+
+                //Rezepte ausgeben lassen
+                SizedBox(height: 30.00,),
+
+                Text('Rezepte:',style: TextStyle(color: darkGrey, fontWeight: FontWeight.bold, fontSize: 20.0, fontFamily: 'Rooney',),),
+
+                SizedBox(height: 10.00,),
+
+                Container(
+
+                  //Stylen
+                  height: 500.00,
+                  width: 340.00,
+                  decoration: BoxDecoration (color: yellowToneDark, borderRadius: BorderRadius.circular(20)),
+
+                  child: ListView.builder(itemCount: boxRezepte.length, itemBuilder: (context, index){
+                    databaseBoxRezepte rezepte = boxRezepte.getAt(index);
+
+                    return ListTile(
+                      title: Text(rezepte.rezepte_titel),
+                      subtitle: Column(
+                        children: [
+                        Text(rezepte.rezepte_id.toString()),
+                        Text(rezepte.rezepte_zeit),
+                        Text(rezepte.rezepte_anleitung),
+                      ]
+                      ),
+                    );
+                  }
+                  ),
+                ),
+
+                SizedBox(height: 20.00,),
+
+                Text('Mapping:',style: TextStyle(color: darkGrey, fontWeight: FontWeight.bold, fontSize: 20.0, fontFamily: 'Rooney',),),
+
+                SizedBox(height: 10.00,),
+
+                Container(
+
+                  //Stylen
+                  height: 500.00,
+                  width: 340.00,
+                  decoration: BoxDecoration (color: yellowToneDark, borderRadius: BorderRadius.circular(20)),
+
+                  child: ListView.builder(itemCount: boxMapping.length, itemBuilder: (context, index){
+                    databaseBoxMapping map = boxMapping.getAt(index);
+
+                    return ListTile(
+                      subtitle: Column(
+                          children: [
+                            Text(map.mappingZutat_id.toString()),
+                            Text(map.mappingRezept_id.toString()),
+                          ]
+                      ),
+                    );
+                  }
+                  ),
+                ),
+
+                SizedBox(height: 20.00,),
+
+                Text('Gefilterte Rezepte:',style: TextStyle(color: darkGrey, fontWeight: FontWeight.bold, fontSize: 20.0, fontFamily: 'Rooney',),),
+
+                SizedBox(height: 10.00,),
+
+                Container(
+
+                  //Stylen
+                  height: 500.00,
+                  width: 340.00,
+                  decoration: BoxDecoration (color: yellowToneDark, borderRadius: BorderRadius.circular(20)),
+
+                  child: ListView.builder(itemCount: boxGefilterteRezepte.length, itemBuilder: (context, index){
+                    databaseBoxRezepteGefiltert ausgabe = boxGefilterteRezepte.getAt(index);
+
+                    return ListTile(
+                      title: Text(ausgabe.gefilterteRezepte_id.toString())
+
+                      );
+                  }
+                  ),
+                  ),
+
+                SizedBox(height: 30.00,),
+
+
               ],
             ),
           ),
       ),
+      bottomNavigationBar: Footer(),
     );
   }
 }

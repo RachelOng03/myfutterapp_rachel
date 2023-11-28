@@ -18,19 +18,16 @@ class databaseBoxRezepteAdapter extends TypeAdapter<databaseBoxRezepte> {
     };
     return databaseBoxRezepte(
       rezepte_id: fields[0] as int,
-      rezepte_titel: fields[1] as int,
-      rezepte_zeit: fields[2] as int,
-      rezepte_kurzbeschreibung: fields[3] as int,
-      rezepte_anleitung: fields[4] as int,
-      rezepte_art: fields[5] as int,
-      rezepte_bild: fields[6] as int,
+      rezepte_titel: fields[1] as String,
+      rezepte_zeit: fields[2] as String,
+      rezepte_anleitung: fields[3] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, databaseBoxRezepte obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.rezepte_id)
       ..writeByte(1)
@@ -38,13 +35,7 @@ class databaseBoxRezepteAdapter extends TypeAdapter<databaseBoxRezepte> {
       ..writeByte(2)
       ..write(obj.rezepte_zeit)
       ..writeByte(3)
-      ..write(obj.rezepte_kurzbeschreibung)
-      ..writeByte(4)
-      ..write(obj.rezepte_anleitung)
-      ..writeByte(5)
-      ..write(obj.rezepte_art)
-      ..writeByte(6)
-      ..write(obj.rezepte_bild);
+      ..write(obj.rezepte_anleitung);
   }
 
   @override

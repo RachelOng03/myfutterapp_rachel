@@ -1,9 +1,9 @@
 
 //Importieren der relevanten Dart-Files
 import 'package:flutter/material.dart';
-import 'package:myfutterapp/Übersichtseite.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:myfutterapp/boxes.dart';
+import 'package:myfutterapp/filter.dart';
 
 
 //Importiere alle Adapter für die Boxen
@@ -12,6 +12,13 @@ import 'package:myfutterapp/databaseBoxFilter.dart';
 import 'package:myfutterapp/databaseBoxMapping.dart';
 import 'package:myfutterapp/databaseBoxRezepteGefiltert.dart';
 import 'package:myfutterapp/databaseBoxRezepte.dart';
+import 'package:myfutterapp/databaseBoxAehnlich.dart';
+import 'package:myfutterapp/zutatDatabaseEditHive.dart';
+import 'package:myfutterapp/filter.dart';
+import 'package:myfutterapp/startseite.dart';
+
+//Nur falls nachträgliche Datenbearbeitung erforderlich
+import 'package:myfutterapp/zutatDatabaseEditHive.dart';
 
 //Main laufen lassen
 void main() async{
@@ -57,6 +64,14 @@ void main() async{
   // Box Rezepte aufmachen
   boxRezepte = await Hive.openBox<databaseBoxRezepte>('databaseBoxRezepte');
 
+  // 6. Adapter für ähnliche Rezepte
+  Hive.registerAdapter(databaseBoxAehnlichAdapter());
+  // Box Rezepte aufmachen
+  boxAehnlich = await Hive.openBox<databaseBoxAehnlich>('databaseBoxAehnlich');
+
+  // Bei Bedarf alle Rezepte löschen / leeren
+  // await boxRezepte.clear();
+  // await boxMapping.clear();
 
   //App laufen lassen
   runApp(MyApp());
@@ -67,13 +82,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
       title: 'MyFutterApp',
 
       //Der Home Bildschirm soll mit der Overview Page gefüllt werden.
       //Später:HomePage
-      home: OverviewPage(),
+      home: zutatDatabaseEditHive(),
+      //MyHomePage(title: ' MyFutterApp ',),
     );
   }
 }
